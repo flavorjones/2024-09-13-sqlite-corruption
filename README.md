@@ -34,6 +34,10 @@ If the parent closes its connections before it forks: no problem. (You can see t
 
 Please note that in this scenario the children are NOT using any database connections inherited from the parent process. Rails does the right thing and creates new connections in the children, which is what is instructed in https://www.sqlite.org/howtocorrupt.html, yet the problem still happens.
 
-## Next steps.
+## Analysis
 
-**It's still very early in the investigation**, but my current hypothesis is that something is going on in shared memory space when the parent exits that then causes problems in the child processes. This may or may not be intended behavior but I'd like to isolate this with a reproduction in C and move the conversation upstream to the sqlite forum.
+What's happening is that open connections and statements that are inherited by the child process are getting cleaned up (closed) by GC which affects the child's connections and may lead to corruption.
+
+## Next steps
+
+Update Rails sqlite3 adapter to close database connections before forking.
