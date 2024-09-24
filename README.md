@@ -4,6 +4,8 @@ This repo reproduces sqlite database corruption using only Active Record and pro
 
 See https://github.com/rails/solid_queue/issues/324 for more context.
 
+See https://github.com/sparklemotion/sqlite3-ruby/releases/tag/v2.1.0.rc1 and https://github.com/sparklemotion/sqlite3-ruby/pull/558 for context on the fix.
+
 ## What is this.
 
 My hunch after reading the issue linked above and [How To Corrupt An SQLite Database File](https://www.sqlite.org/howtocorrupt.html) is that the corruption might have to do with process forking.
@@ -38,6 +40,7 @@ Please note that in this scenario the children are NOT using any database connec
 
 What's happening is that open connections and statements that are inherited by the child process are getting cleaned up (closed) by GC which affects the child's connections and may lead to corruption.
 
-## Next steps
+## Fix
 
-Update Rails sqlite3 adapter to close database connections before forking.
+sqlite3-ruby v2.1.0.rc1 closes open, writable connections after a fork: https://github.com/sparklemotion/sqlite3-ruby/releases/tag/v2.1.0.rc1
+
